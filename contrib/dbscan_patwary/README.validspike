@@ -1,0 +1,10 @@
+This is Patwary's original distribution directory
+dbscan-v1.0.0/parallel_multicore/
+including its original Makefile and README.
+
+I have added one MATLAB code dbscanpatwaryexec.m which calls
+the executable omp_dbscan using temporary files for I/O.
+This is pending a MEX interface, which seems hard to do since
+Patwary's code is not cleanly accessible as a library call.
+
+Barnett 8/13/15

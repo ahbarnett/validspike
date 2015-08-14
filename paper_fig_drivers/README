@@ -1,0 +1,7 @@
+Scripts for figures for validation paper
+
+You will need to set up directories:
+../data_external for raw data from labs
+../data_valid for intermediate results
+
+Barnett 6/4/15

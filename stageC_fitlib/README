@@ -1,0 +1,51 @@
+stageC_fitlib: library of mostly C routines with MEX interfaces
+to MATLAB, useful for rapid fitting of known spike waveforms to data
+(clips or whole time-series). Includes the forward model, and
+implicitly the noise model.
+
+Part of validspike.  A H Barnett, J F Magland,     Dec 2014 - June 2015
+
+Use "make" to compile MEX interfaces.
+
+Optional: use "make mwrap" to generate new MEX interface code; this assumes
+that MWrap is installed and available in the path.
+
+The main entry point is :
+
+  fit_timeseries - fit spike times & labels given time-series data Y and
+  		   waveforms (classifier) W.
+		   This does a self-test on synthesized data when called
+		   without arguments.
+
+Other MATLAB calling points are defined in the MWrap files *.mw as follows.
+Routines with an asterisk (*) are the usual entry-points; others are for
+testing purposes (these are labeled with 'devel' in their 1-line MATLAB help).
+
+spikefit.mw (libraries spikefit.c) :
+
+* spikemod - forward model to fill (or subtract from) one arbitrarily-long clip
+   	     or time-series Y, without noise.
+  fitonesp - fits a 1-spike model to one clip
+* multifitgreedy - multi-spike greedy fitting of set of arbitrary-length clips,
+  		   (multi-threaded)
+
+gluttonfit.mw (libraries gluttonfit.c) :
+
+  fillscore - computes S matrix
+  locvalidmins - finds valid minima in the S matrix
+  minisgammaloc - checks if local valid minimum is global min over interval
+  gluttonstuffme - thresholdless greedy (so-called "glutton") fitting of Y
+* multiglutton - thresholdless greedy (multi-threaded)  
+
+For above MATLAB functions without adequate documentation, see the corresponding
+C function, which is well documented.
+
+There are also some older pure-MATLAB fitting routines that are
+slower, but would allow much more general noise models (non-Gaussian,
+correlated, etc) :
+
+  negloglik - evaluate negative log likelihood of data clip given t,l params
+  fitonespike - fits a 1-spike model to one clip (same interface as fitonesp)
+  fitgreedyspikes - greedy algorithm for one clip, using negloglik
+
+

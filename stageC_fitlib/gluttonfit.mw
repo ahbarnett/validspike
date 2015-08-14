@@ -1,0 +1,159 @@
+% Mwrap file for MEX interface to glutton fitting libraries in scda_ss
+% Barnett 5/5/15-6/11/15
+
+
+% ------------------------------------------------------------------------------
+@function S = fillscore(wf,Y,tsh,noi,o)
+% FILLSCORE  fill S score matrix given timeseries and waveforms (MEX, devel)
+%
+% S = fillscore(wf,Y,tshnoi,opts)
+% Inputs:
+%  wf  - waveform object containing W (M*T*K) and fac (beta upsampling param)
+%  Y   - data matrix (M*Nt)
+%  tsh - list of timeshifts in signal units, relative to first time point in Y
+%  noi - noise model with property noi.eta setting iid Gaussian std deviation.
+%  opts - (optional) controls options such as
+%        opts.skip - 1,2,.. calls smartscore if >1 (overrides shflags)
+%        opts.shflags - boolean giving which cols of S to calc, or set to Nans
+% Outputs:
+%  S   - K*numel(tsh) score matrix
+%
+% Note: this is single-core, and a development MEX interface
+
+if wf.fac~=floor(wf.fac), error('wf.fac must be positive integer!'); end
+W = wf.W; fac = wf.fac;
+[M T K] = size(W);
+if mod(T,2)==0, warning('waveform T must be odd'); end
+[M Nt] = size(Y);
+eta = noi.eta;
+Nsh = numel(tsh); numelS = K*Nsh;  % size of S
+if nargin<5, o = []; end
+if isfield(o,'skip'), skip = o.skip; else skip = fac; end     % default skip
+
+if skip>1
+  # smartscore(double[] W, int M, int T, int K, int fac, double[] Y, int Nt, double[] tsh, int Nsh, output double[K,Nsh] S, double eta, int skip);
+else    % obsolete interface, for checking fillscore...
+  if isfield(o,'shflags'), shflags = double(o.shflags); else shflags=ones(1,Nsh); end % default is calc for all shift indices
+  # fillscore(double[] W, int M, int T, int K, int fac, double[] Y, int Nt, double[] tsh, int Nsh, output double[K,Nsh] S, double eta, int[] shflags);
+end		     
+
+
+% ------------------------------------------------------------------------------
+@function [jt l s] = locvalidmins(S,nlps)
+% LOCVALIDMINS  find local valid minima in the S score matrix (MEX, devel)
+%
+% [jt l s] = locvalidmins(S,nlps)
+%
+% outputs:
+%  jt - time indices (not times) of local minima found
+%  l  - labels of same
+%  s  - S values of same (without nlps contrib)
+%
+% Note: a single-core development MEX interface
+
+[K Nsh] = size(S);
+if nargin<2, nlps = zeros(1,K); end
+
+jt = zeros(1,Nsh); l=jt; s=jt;  % alloc: assume <=1 minimum per time shift pt
+
+# locvalidmins(double[] S, int K, int Nsh, double[] nlps, inout int[] jt, inout int[] l, inout double[] s, output int[1] Nmin);
+% int[1] to get 1 integer out
+
+jt = jt(1:Nmin)+1;  % 1-indexed for matlab
+l = l(1:Nmin); s = s(1:Nmin); % truncate to correct size
+
+
+% ------------------------------------------------------------------------------
+@function keep = minisgammaloc(jt,l,val,tsh,j,gamma)
+% MINISGAMMALOC  test if local minimum is global over an interval (MEX, devel)
+%
+% keep = minisgammaloc(jt,l,val,tsh,j,gamma)
+% Inputs:
+%  jt - list of 1-indexed indices to tsh timeshifts
+%  l - list of types (each element is in 1..K)
+%  val - list of NLP-corrected S values
+%  tsh - list of timeshifts
+%  j - index in 1...numel(jt) to check (1-indexed)
+%  gamma - width in time-samples of region to test global minimum over
+%
+% Note: a single-core development MEX interface
+
+j = j-1; jt=jt-1; % convert to 0-indexing
+N = numel(jt);
+
+# int keep = minisgammaloc(int[] jt, int[] l, double[] val, double[] tsh, int N, int j, double gamma);
+
+
+% ------------------------------------------------------------------------------
+@function [t l Y] = gluttonstuffme(wf,Y,noi,nlps,o)
+% GLUTTONSTUFFME  single-core version of multiglutton (MEX, devel)
+%
+% function [t l Y] = gluttonstuffme(wf,Y,noi,nlps,o)
+%
+% todo: doc. add S output
+%
+% See for usage: sort_filtereddata.m
+%
+% Note: a single-core development MEX interface
+
+if wf.fac~=floor(wf.fac), error('wf.fac must be positive integer!'); end
+W = wf.W; fac = wf.fac;
+[M T K] = size(W);
+if mod(T,2)==0, warning('waveform T must be odd'); end
+[M Nt] = size(Y);
+eta = noi.eta;
+if nargin<4 || isempty(nlps), nlps = zeros(1,K); end
+if nargin<5, o = []; end
+if isfield(o,'skip'), skip = o.skip; else skip = fac; end  % conservative
+if isfield(o,'tpad'), tpad = o.tpad; else tpad = 2.0; end
+if isfield(o,'gamma'), gamma = o.gamma; else gamma = 10.0; end
+if isfield(o,'verb'), verb = o.verb; else verb = 0; end
+
+maxNs = Nt;  % alloc outputs to max size
+
+# gluttonstuffme(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, int verb);
+
+t = t(1:Ns); l = l(1:Ns); a = a(1:Ns);
+t = t(:)'; l = l(:)'; a = a(:)';  % make row vecs
+
+% ------------------------------------------------------------------------------
+@function [t l R] = multiglutton(wf,Y,noi,nlps,o)
+% MULTIGLUTTON  thresholdless fit spike times, labels in timeseries (MEX/OpenMP)
+%
+% function [t l] = multiglutton(wf,Y,noi,nlps,o) returns times t and labels l of
+%  all spikes fitted in multi-channel time-series Y, given waveform object wf
+%  (containing wf.W waveforms, etc), noise parameters in noi, prior firing
+%  probabilies in nlps, and possible options in o.
+%
+% function [t l R] = multiglutton(wf,Y,noi,nlps,o) also returns residual R;
+%  however this residual has errors within T of the chunk breakpoints. Therefore,
+%  not recommended!
+%
+% See for usage: sort_filtereddata
+
+% todo: better doc
+% Barnett May 2015
+
+% same code as gluttonstuffme...
+if wf.fac~=floor(wf.fac), error('wf.fac must be positive integer!'); end
+W = wf.W; fac = wf.fac;
+[M T K] = size(W);
+if mod(T,2)==0, warning('waveform T must be odd'); end
+[M Nt] = size(Y);
+Y = double(Y);        % essential in case comes in as float or int
+eta = noi.eta;
+if nargin<4 || isempty(nlps), nlps = zeros(1,K); end
+if nargin<5, o = []; end
+if isfield(o,'skip'), skip = o.skip; else skip = fac; end  % conservative
+if isfield(o,'tpad'), tpad = o.tpad; else tpad = 2.0; end
+if isfield(o,'gamma'), gamma = o.gamma; else gamma = 10.0; end
+if isfield(o,'verb'), verb = o.verb; else verb = 0; end
+
+maxNs = Nt; % alloc outputs to max size
+wantR = double(nargout>2);
+if wantR, warning('residual R from multiglutton has errors at chunk ends!'); end
+
+# multiglutton(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, output double[M,Nt] R, int wantR, int verb);
+
+t = t(1:Ns); l = l(1:Ns); a = a(1:Ns);
+t = t(:)'; l = l(:)'; a = a(:)';  % make row vecs
