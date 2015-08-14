@@ -31,7 +31,7 @@ Optional dependencies: [spikespy](https://github.com/magland/spikespy) for time-
 
 ## Basic usage
 
-To spike sort time series data, we assume you have `Y` an M-by-N data array with M channels and N time points. Then call `[t l p wf R] = spikesort_timeseries(Y,samplefreq)` where `samplefreq` is the sampling rate in Hz. There are plenty of options; see the help documentation for this function, and the options in `examples/demo_spikesort_timeseries_buzsaki.m` (which however relies on not-supplied data). For clip-based sorting, see documentation for `spikesort_clips`.
+To spike sort time series data, we assume you have `Y` an M-by-N data array with M channels and N time points. Then call `[t l] = spikesort_timeseries(Y,samplefreq)` where `samplefreq` is the sampling rate in Hz. This will output firing times `t` (in sample units) and corresponding labels `l`. There are plenty of options and other outputs; see the help documentation for this function, and the options in `examples/demo_spikesort_timeseries_buzsaki.m` (which however relies on not-supplied data). For clip-based sorting, see documentation for `spikesort_clips`.
 
 See examples of usage in `examples/driver_*` and for the expert see `paper_fig_drivers/*`
 
@@ -105,11 +105,10 @@ These are driver scripts that can be called without arguments, and run complete 
 
 `data/`  example waveforms, and where around 100 MB of synthetic data is placed  
 `paper_fig_drivers/` figure-generating codes for the above preprint and other research. EPS figure output is written to `~/spikesorting/validpaper/` which you should create if you want the EPS outputs.  
-`data_external/` and `data/valid/`  are data directories used by us, that is accessed by some advanced examples and figure-generating codes  
+`data_external/` and `data_valid/`  are data directories used by us, that is accessed by some advanced examples and figure-generating codes  
 
 ## To do
 
 * generalize the stability metric evaluation to variable K (# of neurons)
 * better documentation of I/O interfaces, usage
-* prevent allocation overrun in stageC_fitlib C libraries
 * make demo data with more variation in neuron quality

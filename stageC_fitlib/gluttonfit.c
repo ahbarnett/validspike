@@ -218,7 +218,7 @@ Input arguments:
 void gluttonstuffme(double* W, int M, int T, int K, int fac, double* Y, int Nt,
 		    double tpad, double eta, int skip, double gamma,
 		    double* nlps, double* t, int* l, double* a, int* Ns,
-		    int verb)
+		    int maxNs, int verb)
 /* repeated glutton fit rounds on same chunk, single thread version
 
  Arguments: 
@@ -239,8 +239,9 @@ void gluttonstuffme(double* W, int M, int T, int K, int fac, double* Y, int Nt,
    nlps - (K double input) negative log priors (lambda_l) on firing rates for
           spike types
    t,l,a - output arrays of times (double), labels (int in 1...K), amplitude
-          (double). Each must be allocated long enough for # spikes found.
+          (double). Each must be allocated to at least length maxNs.
    Ns - pointer to number of spikes found, ie length of the t,l,a arrays output.
+   maxNs - maximum number of spikes possible.
    verb - (int input) 0,1,... verbosity
 
    Cost is O(NKTM), memory workspace O(KN)
@@ -283,9 +284,12 @@ void gluttonstuffme(double* W, int M, int T, int K, int fac, double* Y, int Nt,
 	  t[c] = tsh[jm[j]];  // add spike to output list (jm is 1-indexed)
 	  l[c] = lm[j];
 	  a[c] = 1.0;        // dummy ampl (spikemod needs)
-	  c++;
+	  if (c<maxNs) c++;
 	}
 
+    if (c>=maxNs)
+      fprintf(stderr,"gluttonstuffme exceeded maxNs=%d number of spikes!\n",maxNs);
+    
     // run fwd model with only newest spikes (since cst), subtracting from Y
     int iran[2];  // unused
     spikemod(W,M,T,K,fac,c-cst,l+cst,t+cst,a+cst,Nt,Y,1,iran);
@@ -375,7 +379,7 @@ void multiglutton(double* W, int M, int T, int K, int fac, double* Y, int N,
 	  Yc[m+M*i] = Y[m+M*(i+toff[c])];
       
       gluttonstuffme(W, M, T, K, fac, Yc, Nt[c], tpad, eta, skip, gamma,
-		     nlps, t+o, l+o, a+o, Nss+c, verb);      // glutton on Yc
+		     nlps, t+o, l+o, a+o, Nss+c, maxNs, verb);  // glutton on Yc
       if (verb>1) printf("done, Nss[%d]=%d\n",c,Nss[c]);
 
       if (wantR) {                // write middle of chunk Yc to R, todo fix
