@@ -57,7 +57,7 @@ if o.verb, fprintf('eval_stab_clipbased: # clips = %d (M=%d, Nt=%d)\n',N,M,Nt); 
 fsam = []; info.Qs = {};
 
 if strcmp(o.meth,'rerun') % ================== simple rerunning on full set
-  if ~isfield(o,'allpairs'), o.allpairs = 0; end
+  if ~isfield(o,'allpairs'), o.allpairs = 0; Nr = 2*Nr; end  % since Nr = # pairs
   for r=1:Nr, fprintf('ss run %d\n',r)
     L{r} = alg(X,ssopts);       % do the SS
   end
@@ -66,7 +66,7 @@ if strcmp(o.meth,'rerun') % ================== simple rerunning on full set
     disp('populations in "main" run:'), fprintf('%6d ',pops), fprintf('\n')
   end
   if ~o.allpairs        % plain compare runs in pairs
-    for i=1:2:2*Nr-1
+    for i=1:2:Nr-1
       [~,Q,acc] = labels_accuracy(L{i},L{i+1},o);
       fsam = [fsam; acc.p];    % todo *** only works if K fixed
       info.Qs = {info.Qs{:} Q};

@@ -15,8 +15,6 @@ MWRAP = mwrap
 
 default: greedy glutton
 
-mwrap: sf.c gf.c greedy glutton
-
 sf.c: spikefit.mw
 # note -mb here makes separate .m file for each @ function in the .mw ...
 	$(MWRAP) -list -mex sf -mb spikefit.mw
@@ -34,5 +32,5 @@ glutton: gf.c gluttonfit.o spikefit.o spikefit.h
 	mex gf.c gluttonfit.o spikefit.o -lm -lgomp
 
 clean:
-	rm -f *.o *.mex* *~
+	rm -f *.o *.mex*
 # note, doesn't clean out the .c and .m mwrap-generated files

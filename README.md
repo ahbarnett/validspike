@@ -21,11 +21,20 @@ Optional dependencies: [spikespy](https://github.com/magland/spikespy) for time-
 
         run VSHOME/vs_startup
 
-2. In the top level (`validspike`) directory, run `make` to compile various C/MEX codes and contributed codes. You may need to adjust compiler flags in the file `mexopts.sh` in MATLAB's installation. For instance, on an ubuntu 12.04 system running MATLAB R2012a I needed to add the flag `--openmp` to `LDFLAGS` in the `glnxa64)` case.
+1. In the top level (`validspike`) directory, run `make` to compile various C/MEX codes and contributed codes. You may need to adjust compiler flags in the file `mexopts.sh` in MATLAB's installation. For instance, on an ubuntu 12.04 system running MATLAB R2012a I needed to add the flag `--openmp` to `LDFLAGS` in the `glnxa64)` case.
 
-3. From MATLAB, run `testall` which should take 1-2 minutes and complete without error. It will generate synthetic data files of 100 MB in size in the `data/` directory from the example waveforms there. These synthetic files are then used in the self-tests of various functions.
+1. From MATLAB, run `driver_clips` which should take less than 5 s and complete without error, reporting around 98% correct. It will generate synthetic data files of 100 MB in size in the `data/` directory from the example waveforms there. These synthetic files are then used in the self-tests of various functions. Also try the other `driver_*` functions in `examples/`
 
-See the data load function `examples/loaddata.m` to see ideas for loading your own datasets. Currently this function is set up to point to various datasets in `data_external/` which are not distributed.
+1. To perform a full test, run `testall` from MATLAB, which should take 2 minutes, produce a lot of figures, but complete without error.
+
+1. Troubleshooting: if MATLAB says functions `sf` or `gf` are undefined, you have not correctly compiled the MEX interfaces.
+
+## Basic usage
+
+To spike sort time series data, we assume you have `Y` an M-by-N data array with M channels and N time points. Then call `[t l p wf R] = spikesort_timeseries(Y,samplefreq)` where `samplefreq` is the sampling rate in Hz. There are plenty of options; see the help documentation for this function, and the options in `examples/demo_spikesort_timeseries_buzsaki.m` (which however relies on not-supplied data). For clip-based sorting, see documentation for `spikesort_clips`.
+
+See examples of usage in `examples/driver_*` and for the expert see `paper_fig_drivers/*`
+
 
 ## Directories in this package
 
@@ -84,7 +93,9 @@ These are driver scripts that can be called without arguments, and run complete 
 
 `driver_clips`  demonstrate clip-based spike sorting on synthetic clips data  
 `driver_timeseries`  demonstrate spike sorting on synthetic time series data  
-`loaddata` an example of loading EC timeseries object from various (not supplied) datasets  
+`driver_clips_stability`  shows validation of clip-based spike sorting  
+`driver_timeseries_stability`  shows validation of time series spike sorting  
+`loaddata`  examples of loading EC timeseries objects from various (not supplied) datasets  
 
 ####contrib
 
@@ -93,5 +104,12 @@ These are driver scripts that can be called without arguments, and run complete 
 ## Other directories
 
 `data/`  example waveforms, and where around 100 MB of synthetic data is placed  
-`paper_fig_drivers/` figure-generating codes for the above preprint and other research  
-`data_external/` a data directory used by us, that is accessed by some advanced examples and figure-generating codes  
+`paper_fig_drivers/` figure-generating codes for the above preprint and other research. EPS figure output is written to `~/spikesorting/validpaper/` which you should create if you want the EPS outputs.  
+`data_external/` and `data/valid/`  are data directories used by us, that is accessed by some advanced examples and figure-generating codes  
+
+## To do
+
+* generalize the stability metric evaluation to variable K (# of neurons)
+* better documentation of I/O interfaces, usage
+* prevent allocation overrun in stageC_fitlib C libraries
+* make demo data with more variation in neuron quality

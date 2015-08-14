@@ -61,6 +61,8 @@ spikesetmatch   % legacy, used only to test greedy clips in stageC_fitlib
 % examples
 driver_clips
 driver_timeseries
+driver_clips_stability
+driver_timeseries_stability
 
 %%%%%%%%%%%%%%%%%%% clean up...
 load('/tmp/testall.mat');  % just to get t_testall
