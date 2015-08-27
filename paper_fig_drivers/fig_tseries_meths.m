@@ -61,3 +61,19 @@ if 0 % regen the t-series plot...
   % get scale correct:
   min(d.A(2,1:40*20))  % -355 sets vert scale in plot
 end
+
+if 0 % regen the xcorr plot...
+  load data_valid/tseries_thresh100K10keep10.mat
+  show_crosscorr(o.L,o.T);  % physiological (refractory hole) check on unpert run
+  set(gcf,'paperposition',[0 0 5 5]);                                   
+  print -depsc2 ../spikesorting/validpaper/tseries_xcorr.eps
+end
+
+if 0 % report the number of "overlapping" (nearby) spikes...
+  t = sort(o.T);
+  fprintf('tot spikes/sec = %.3g\n',numel(t)/(d.dt*max(t)))
+  fprintf('frac spikes within 0.5 ms of prev = %.3g\n',numel(find(diff(t)<=10))/numel(t))
+  fprintf('frac spikes within 0.1 ms of prev = %.3g\n',numel(find(diff(t)<=2))/numel(t))
+  fprintf('frac spikes within 0.5 ms of another = %.3g\n',numel(find(diff(t(1:end-1))<=10 | diff(t(2:end))<=10))/numel(t))
+  fprintf('frac spikes within 0.1 ms of prev = %.3g\n',numel(find(diff(t(1:end-1))<=2 | diff(t(2:end))<=2))/numel(t))
+end

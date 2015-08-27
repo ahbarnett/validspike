@@ -1,5 +1,5 @@
 % validation paper f:clips
-% Barnett 6/24/15
+% Barnett 6/24/15. Legend blobs bigger 8/26/15
 
 clear
 % ------------ buzsaki:
@@ -9,6 +9,9 @@ o = []; o.cmethod = 'k++'; o.K = 8; % choose clustering method (this one needs K
 o.verb = 1; [l W z cinfo] = spikesort_clips(X,o);   % 8 sec
 plot_labeled_pts(z,l);
 set(gcf,'paperposition',[0 0 6 4]);
+%h=get(gca,'children'); set(h,'markersize',20)
+h=findobj(get(findobj(gcf,'tag','legend'),'children'),'type','line');
+set(h,'markersize',20);   % make legend blobs only bigger
 % now move the legend by hand before outputting...
 print -depsc2 ~/spikesorting/validpaper/clipsz.eps
 
