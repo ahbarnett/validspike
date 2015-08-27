@@ -111,7 +111,7 @@ if isfield(o,'verb'), verb = o.verb; else verb = 0; end
 
 maxNs = Nt;  % alloc outputs to max size
 
-# gluttonstuffme(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, int verb);
+# gluttonstuffme(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, int maxNs, int verb);
 
 t = t(1:Ns); l = l(1:Ns); a = a(1:Ns);
 t = t(:)'; l = l(:)'; a = a(:)';  % make row vecs

@@ -598,9 +598,9 @@ mw_err_label:
 }
 
 /* ---- gluttonfit.mw: 114 ----
- * gluttonstuffme(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, int verb);
+ * gluttonstuffme(double[] W, int M, int T, int K, int fac, inout double[] Y, int Nt, double tpad, double eta, int skip, double gamma, double[] nlps, output double[maxNs] t, output int[maxNs] l, output double[maxNs] a, output int[1] Ns, int maxNs, int verb);
  */
-const char* stubids5_ = "gluttonstuffme(i double[], i int, i int, i int, i int, io double[], i int, i double, i double, i int, i double, i double[], o double[x], o int[x], o double[x], o int[x], i int)";
+const char* stubids5_ = "gluttonstuffme(i double[], i int, i int, i int, i int, io double[], i int, i double, i double, i int, i double, i double[], o double[x], o int[x], o double[x], o int[x], i int, i int)";
 
 void mexStub5(int nlhs, mxArray* plhs[],
               int nrhs, const mxArray* prhs[])
@@ -618,20 +618,21 @@ void mexStub5(int nlhs, mxArray* plhs[],
     int         in9_;    /* skip       */
     double      in10_;    /* gamma      */
     double*     in11_ =0; /* nlps       */
-    int         in12_;    /* verb       */
+    int         in12_;    /* maxNs      */
+    int         in13_;    /* verb       */
     double*     out1_=0; /* t          */
     int*        out2_=0; /* l          */
     double*     out3_=0; /* a          */
     int*        out4_=0; /* Ns         */
-    mwSize      dim13_;   /* maxNs      */
     mwSize      dim14_;   /* maxNs      */
     mwSize      dim15_;   /* maxNs      */
-    mwSize      dim16_;   /* 1          */
+    mwSize      dim16_;   /* maxNs      */
+    mwSize      dim17_;   /* 1          */
 
-    dim13_ = (mwSize) mxWrapGetScalar(prhs[13], &mw_err_txt_);
     dim14_ = (mwSize) mxWrapGetScalar(prhs[14], &mw_err_txt_);
     dim15_ = (mwSize) mxWrapGetScalar(prhs[15], &mw_err_txt_);
     dim16_ = (mwSize) mxWrapGetScalar(prhs[16], &mw_err_txt_);
+    dim17_ = (mwSize) mxWrapGetScalar(prhs[17], &mw_err_txt_);
 
     if (mxGetM(prhs[0])*mxGetN(prhs[0]) != 0) {
         in0_ = mxGetPr(prhs[0]);
@@ -677,23 +678,26 @@ void mexStub5(int nlhs, mxArray* plhs[],
     in12_ = (int) mxWrapGetScalar(prhs[12], &mw_err_txt_);
     if (mw_err_txt_)
         goto mw_err_label;
-    out1_ = (double*) mxMalloc(dim13_*sizeof(double));
-    out2_ = (int*) mxMalloc(dim14_*sizeof(int));
-    out3_ = (double*) mxMalloc(dim15_*sizeof(double));
-    out4_ = (int*) mxMalloc(dim16_*sizeof(int));
+    in13_ = (int) mxWrapGetScalar(prhs[13], &mw_err_txt_);
+    if (mw_err_txt_)
+        goto mw_err_label;
+    out1_ = (double*) mxMalloc(dim14_*sizeof(double));
+    out2_ = (int*) mxMalloc(dim15_*sizeof(int));
+    out3_ = (double*) mxMalloc(dim16_*sizeof(double));
+    out4_ = (int*) mxMalloc(dim17_*sizeof(int));
     if (mexprofrecord_)
         mexprofrecord_[5]++;
-    gluttonstuffme(in0_, in1_, in2_, in3_, in4_, in5_, in6_, in7_, in8_, in9_, in10_, in11_, out1_, out2_, out3_, out4_, in12_);
+    gluttonstuffme(in0_, in1_, in2_, in3_, in4_, in5_, in6_, in7_, in8_, in9_, in10_, in11_, out1_, out2_, out3_, out4_, in12_, in13_);
     plhs[0] = mxCreateDoubleMatrix(mxGetM(prhs[5]), mxGetN(prhs[5]), mxREAL);
     mxWrapCopy_double(plhs[0], in5_, mxGetM(prhs[5])*mxGetN(prhs[5]));
-    plhs[1] = mxCreateDoubleMatrix(dim13_, 1, mxREAL);
-    mxWrapCopy_double(plhs[1], out1_, dim13_);
-    plhs[2] = mxCreateDoubleMatrix(dim14_, 1, mxREAL);
-    mxWrapCopy_int(plhs[2], out2_, dim14_);
-    plhs[3] = mxCreateDoubleMatrix(dim15_, 1, mxREAL);
-    mxWrapCopy_double(plhs[3], out3_, dim15_);
-    plhs[4] = mxCreateDoubleMatrix(dim16_, 1, mxREAL);
-    mxWrapCopy_int(plhs[4], out4_, dim16_);
+    plhs[1] = mxCreateDoubleMatrix(dim14_, 1, mxREAL);
+    mxWrapCopy_double(plhs[1], out1_, dim14_);
+    plhs[2] = mxCreateDoubleMatrix(dim15_, 1, mxREAL);
+    mxWrapCopy_int(plhs[2], out2_, dim15_);
+    plhs[3] = mxCreateDoubleMatrix(dim16_, 1, mxREAL);
+    mxWrapCopy_double(plhs[3], out3_, dim16_);
+    plhs[4] = mxCreateDoubleMatrix(dim17_, 1, mxREAL);
+    mxWrapCopy_int(plhs[4], out4_, dim17_);
 
 mw_err_label:
     if (in5_)  mxFree(in5_);

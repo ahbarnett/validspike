@@ -24,8 +24,8 @@ if isfield(o,'verb'), verb = o.verb; else verb = 0; end
 
 maxNs = Nt;  % alloc outputs to max size
 
-mex_id_ = 'gluttonstuffme(i double[], i int, i int, i int, i int, io double[], i int, i double, i double, i int, i double, i double[], o double[x], o int[x], o double[x], o int[x], i int)';
-[Y, t, l, a, Ns] = gf(mex_id_, W, M, T, K, fac, Y, Nt, tpad, eta, skip, gamma, nlps, verb, maxNs, maxNs, maxNs, 1);
+mex_id_ = 'gluttonstuffme(i double[], i int, i int, i int, i int, io double[], i int, i double, i double, i int, i double, i double[], o double[x], o int[x], o double[x], o int[x], i int, i int)';
+[Y, t, l, a, Ns] = gf(mex_id_, W, M, T, K, fac, Y, Nt, tpad, eta, skip, gamma, nlps, maxNs, verb, maxNs, maxNs, maxNs, 1);
 
 t = t(1:Ns); l = l(1:Ns); a = a(1:Ns);
 t = t(:)'; l = l(:)'; a = a(:)';  % make row vecs
