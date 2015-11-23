@@ -4,23 +4,27 @@
 # todo: make openmp a make task.
 # Barnett 2/13/15. glutton 5/4/5, linking spikefit.h 5/19/15
 # split off mwrap away from the user's default make 6/18/15
-# Tidy 8/14/15
+# Tidy 8/14/15. Correct header dependencies 11/20/15
 
 # If you want to use Mwrap, point to it here:
 MWRAP = mwrap
+
+default: greedy glutton
+# note these two always mex-compiled since are dummy targets
 
 .c.o:
 	gcc -fPIC -fopenmp -O3 -c $<
 #	gcc -fPIC -O3 -c $<
 
-default: greedy glutton
+# so headers trigger recompile
+spikefit.o gluttonfit.o: spikefit.h
 
 sf.c: spikefit.mw
 # note -mb here makes separate .m file for each @ function in the .mw ...
 	$(MWRAP) -list -mex sf -mb spikefit.mw
 	$(MWRAP) -mex sf -c sf.c spikefit.mw
 
-greedy: sf.c spikefit.o spikefit.h
+greedy: sf.c spikefit.o
 	mex sf.c spikefit.o -lm -lgomp
 #	mex sf.c spikefit.o -lm
 
@@ -28,7 +32,7 @@ gf.c: gluttonfit.mw
 	$(MWRAP) -list -mex gf -mb gluttonfit.mw
 	$(MWRAP) -mex gf -c gf.c gluttonfit.mw
 
-glutton: gf.c gluttonfit.o spikefit.o spikefit.h
+glutton: gf.c gluttonfit.o spikefit.o
 	mex gf.c gluttonfit.o spikefit.o -lm -lgomp
 
 clean:

@@ -306,7 +306,7 @@ mxWrapGetArrayDef(mxWrapGetArray_ulong, ulong)
 mxWrapCopyDef    (mxWrapCopy_ulong,     ulong)
 mxWrapReturnDef  (mxWrapReturn_ulong,   ulong)
 
-/* ---- spikefit.mw: 41 ----
+/* ---- spikefit.mw: 45 ----
  * spikemod(double[] W, int M, int T, int K, int fac, int Ns, int[] l, double[] t, double[] a, int Nt, output double[M, Nt] F, int subF, inout int[2] iran);
  */
 const char* stubids1_ = "spikemod(i double[], i int, i int, i int, i int, i int, i int[], i double[], i double[], i int, o double[xx], i int, io int[x])";
@@ -402,7 +402,7 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- spikefit.mw: 89 ----
+/* ---- spikefit.mw: 93 ----
  * fitonesp(double[] W, int M, int T, int K, int fac, output int[1] lb, output double[1] tb, output double[1] ab, int Nt, double[] Y, double eta, double tpad, output double[M, Nt] Fb, output double[1] Jbest, double[] nlps, int locflag, inout double[] srt);
  */
 const char* stubids2_ = "fitonesp(i double[], i int, i int, i int, i int, o int[x], o double[x], o double[x], i int, i double[], i double, i double, o double[xx], o double[x], i double[], i int, io double[])";
@@ -516,7 +516,7 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- spikefit.mw: 164 ----
+/* ---- spikefit.mw: 168 ----
  * multifitgreedy(double[] W, int M, int T, int K, int fac, output int[1, Nc] Ns, output int[maxNs, Nc] l, output double[maxNs, Nc] t, output double[maxNs, Nc] a, int[] Tc, int Nc, double[] Y, double eta, double tpad, int maxNs, int 1, output double[nrJ, Nc] Jhist, output double[M, Ttot] R, double[] nlps, int locflag);
  */
 const char* stubids3_ = "multifitgreedy(i double[], i int, i int, i int, i int, o int[xx], o int[xx], o double[xx], o double[xx], i int[], i int, i double[], i double, i double, i int, i int, o double[xx], o double[xx], i double[], i int)";
@@ -653,7 +653,7 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- spikefit.mw: 167 ----
+/* ---- spikefit.mw: 171 ----
  * multifitgreedy(double[] W, int M, int T, int K, int fac, output int[1, Nc] Ns, output int[maxNs, Nc] l, output double[maxNs, Nc] t, output double[maxNs, Nc] a, int[] Tc, int Nc, double[] Y, double eta, double tpad, int maxNs, int 0, output double[nrJ, Nc] Jhist, inout double[] R, double[] nlps, int locflag);
  */
 const char* stubids4_ = "multifitgreedy(i double[], i int, i int, i int, i int, o int[xx], o int[xx], o double[xx], o double[xx], i int[], i int, i double[], i double, i double, i int, i int, o double[xx], io double[], i double[], i int)";
@@ -827,10 +827,10 @@ void mexFunction(int nlhs, mxArray* plhs[],
     } else if (strcmp(id, "*profile report*") == 0) {
         if (!mexprofrecord_)
             mexPrintf("Profiler inactive\n");
-        mexPrintf("%d calls to spikefit.mw:41\n", mexprofrecord_[1]);
-        mexPrintf("%d calls to spikefit.mw:89\n", mexprofrecord_[2]);
-        mexPrintf("%d calls to spikefit.mw:164\n", mexprofrecord_[3]);
-        mexPrintf("%d calls to spikefit.mw:167\n", mexprofrecord_[4]);
+        mexPrintf("%d calls to spikefit.mw:45\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to spikefit.mw:93\n", mexprofrecord_[2]);
+        mexPrintf("%d calls to spikefit.mw:168\n", mexprofrecord_[3]);
+        mexPrintf("%d calls to spikefit.mw:171\n", mexprofrecord_[4]);
     } else if (strcmp(id, "*profile log*") == 0) {
         FILE* logfp;
         if (nrhs != 2 || mxGetString(prhs[1], id, sizeof(id)) != 0)
@@ -840,10 +840,10 @@ void mexFunction(int nlhs, mxArray* plhs[],
             mexErrMsgTxt("Cannot open log for output");
         if (!mexprofrecord_)
             fprintf(logfp, "Profiler inactive\n");
-        fprintf(logfp, "%d calls to spikefit.mw:41\n", mexprofrecord_[1]);
-        fprintf(logfp, "%d calls to spikefit.mw:89\n", mexprofrecord_[2]);
-        fprintf(logfp, "%d calls to spikefit.mw:164\n", mexprofrecord_[3]);
-        fprintf(logfp, "%d calls to spikefit.mw:167\n", mexprofrecord_[4]);
+        fprintf(logfp, "%d calls to spikefit.mw:45\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to spikefit.mw:93\n", mexprofrecord_[2]);
+        fprintf(logfp, "%d calls to spikefit.mw:168\n", mexprofrecord_[3]);
+        fprintf(logfp, "%d calls to spikefit.mw:171\n", mexprofrecord_[4]);
         fclose(logfp);
     } else
         mexErrMsgTxt("Unknown identifier");

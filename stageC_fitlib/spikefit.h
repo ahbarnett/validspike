@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define MAXSPIKESPEREVENT 100000         // static, and can use for big clips
+#define MAXSPIKESPEREVENT 200000         // static, and can use for big clips
+// note making this bigger statically allocates more memory
 
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 #define MAX(a, b)  (((a) > (b)) ? (a) : (b))
