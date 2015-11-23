@@ -17,13 +17,14 @@ clear p co so
 
 
 % 2. Create fresh synthetic data (post-frequency-filtered) -----------------
-N = 1e6;             % length in samples
-rates = wf.freqs; % use the same rates as in data...
-%rates(9) = 0;    % .. but kill noise cluster
+N = 1e6;             % length in samples - should be 2.4e6 to match EJ 120s?
+rates = wf.freqs;  % use the same rates as in data...
+%rates(9) = 0;   % ...but kill noise cluster? didn't rearrange wf yet
 tpad = 10;           % end padding in samples
 so = [];  % synth opts...
 so.truePois = 1;
-so.ampl = 0.2;     % *** firing variation they wanted: relative ampl std dev
+so.ampl = 0.4;     % *** firing variation they wanted: relative ampl std dev
+% but we should vary more
 noi.Nt = N; noi.M = size(wf.W,1);   % basic params for noise model
 [Y ptrue] = synth_Poissonspiketrain(wf,N,rates,noi,tpad,[],so);
 fprintf('synth done, %d spikes\n',numel(ptrue.t));
@@ -53,14 +54,14 @@ S = @(Y) spikesort_timeseries(Y,wf.d.samplefreq,co,[],so); % interface: t,l out
 [t l] = S(Y);   % sort (few sec)
 o.max_matching_offset=10;
 [permL2 P acc times]=times_labels_accuracy(ptrue.t,ptrue.l,t,l,o); % a few sec
-% acc.p are the accuracy f_k values
+% acc.p are the accuracy f_k values (not acc.f, careful!)
 
 
 % 4. Stability metric for sorting ----------------------------------
 % general stability metric options (verb=3 allows paper outputs)
 o = []; o.Nt = 60; o.max_matching_offset=10; o.verb = 3;
 % stability opts specific to addition metric...
-o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 20;
+o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 20; % 20 runs takes 3-4 mins
 [fahat,fasam,infoa] = eval_stability_tseriesbased(S, Y, o);
 
 
@@ -74,4 +75,11 @@ title('orange = acc, black = stability')
 set(gcf,'paperposition',[0 0 5 5]);
 % you can see good correlation, but accuracy is 2-3x closer to 1 than stability.
 
+print -depsc2 acc_vs_stab_ampl.4_Poissonfiring.eps
+
 % Leslie discussed stating corr coeff of the two...
+figure; plot(acc.p, fahat, '+'); xlabel('acc'); ylabel('f_k hat');
+title('scatter for ampl std dev = 0.4, K=10');
+print -depsc2 acc_vs_stab_ampl.4_Poissonfiring_scatter.eps
+
+% ie acc.p and fahat
