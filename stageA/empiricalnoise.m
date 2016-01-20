@@ -1,22 +1,27 @@
-function noi = empiricalnoise(d)
+function noi = empiricalnoise(d,o)
 % EMPIRICALNOISE - extract noise model parameters from raw EC dataset
 %
-% noi = empiricalnoise(d). Currently two methods for noi.eta built in.
+% noi = empiricalnoise(d) returns a struct giving a noise model estimated
+%  from EC dataset object d.
+%
+% noi = empiricalnoise(d,opts) controls options:
+%   opts.meth sets method: 'a' curvature of small signal data
+%                          'j' mode of clip-estimated RMS distribution (default)
 %
 % Inputs:
 %  d - raw EC dataset struct, with fields: A - (M*Nt) raw data
 %                                          dt - timestep
-%                                          etc
+%                                          samplefreq = 1/dt
 % Outputs:
 %  noi - noise model struct with fields: eta - std error in iid Gauss model
 %
-% todo: self-test
+% todo: self-test, fit other noise models. Fix 'j' fail for large M
 
-% Barnett 2/12/15 
+% Barnett 2/12/15. meth opt 8/28/15
+if nargin<2, o = []; end
+if ~isfield(o,'meth'), o.meth = 'j'; end   % default
 
-meth='j';   % choose method.   todo: make opt
-
-if strcmp(meth,'a')          % Alex idea: curvature of small signal data
+if strcmp(o.meth,'a')          % Alex idea: curvature of small signal data
   sc = max(abs(d.A(:))); % fit a Gaussian noise model to small-ampl data...
   b = (-1:0.01:1)'*sc;  % bin centers
   %for m=1:M, %m = 3; h = histc(d.A(m,:),b); % explore each channel separately
@@ -26,11 +31,14 @@ if strcmp(meth,'a')          % Alex idea: curvature of small signal data
   %figure; bar(b,h); set(gca,'yscale','log'); hold on; plot(b,exp(co(1)+co(2)*b-b.^2/(2*eta^2)),'r-');
   noi.eta = eta; % use est std error as Gaussian model
 
-elseif strcmp(meth,'j')      % Jeremy idea: mode of clip-estimated eta distn
+elseif strcmp(o.meth,'j')      % Jeremy idea: mode of clip-estimated eta distn
   Nc = 1e4;   % # clips
   Tclip = 0.003;  % time clip length in secs. todo: make opt
   T = ceil(Tclip*d.samplefreq); % # samples in time clip
   [M Nt] = size(d.A);
+  if Nt<=T
+    error(sprintf('size(d.A,2) is too small, needs to exceed T=%d\n',T));
+  end
   t = randi(Nt-T,1,Nc); % start indices of clips
   etas = nan(1,Nc);
   for c=1:Nc
