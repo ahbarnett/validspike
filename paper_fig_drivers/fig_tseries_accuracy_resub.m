@@ -37,6 +37,8 @@ fprintf('synth done, %d spikes\n',numel(ptrue.t));
 %    Y = Y + freqfilter(noisesample(noi),wf.d.samplefreq,300,[]));
 % We can discuss this.
 
+save data_valid/synth_accuracy_gndtruth.mat Y ptrue so noi
+
 spikespy({Y,ptrue.t,ptrue.l,'synth'});   % show what we made
 show_crosscorr(ptrue.l,ptrue.t);  % no refractory holes, of course, since
                                   % purely Poisson spike trains for now
