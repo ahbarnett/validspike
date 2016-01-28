@@ -6,7 +6,7 @@ function C = empiricalspacetimecorr(d,thresh,o);
 % Inputs:
 %  d - signal data object with M-by-M data d.A, d.dt sample time, etc
 %  thresh - (optional) threshold below which counted as noise clip, measured if
-%           not given or empty.
+%           not given or empty. thresh=Inf does not threshold.
 %  o - options including:
 %      o.verb - if true, make a figure
 % Outputs:

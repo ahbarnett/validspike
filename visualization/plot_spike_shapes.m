@@ -47,6 +47,7 @@ function plot_spike_shapes(w,title0,vertical_spread,t,fig,o)
 
 if nargin<1, test_plot_spike_shapes; return; end
 if nargin<2 || isempty(title0), title0=''; end
+if isempty(w), error('w is empty!'); end
 if ~isstruct(w), w = mergeclips(w); end   % convert to struct in variable-len
 if nargin<3 || isempty(vertical_spread), vertical_spread = 1.0 * max(abs(w.X(:))); end; % auto scale
 if vertical_spread==0, vertical_spread = 1e-16; end % tiny value (in case w.X=0)

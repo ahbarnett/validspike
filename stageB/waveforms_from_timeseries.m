@@ -1,4 +1,4 @@
-function wf = waveforms_from_timeseries(A,samplefreq,o)
+function [wf L z] = waveforms_from_timeseries(A,samplefreq,o)
 % WAVEFORMS_FROM_TIMESERIES  estimate waveforms from time series.
 %
 % wf = waveforms_from_timeseries(A,opts) returns a waveform object wf
@@ -38,7 +38,8 @@ if ~isfield(o,'minpop'), o.minpop = 6; end
 d.A = A; d.samplefreq = samplefreq; d.dt = 1/d.samplefreq; % fake an EC obj d
 d.T = d.dt*size(d.A,2); clear A;
 
-if o.verb, noi = empiricalnoise(d); fprintf('\tnoi.eta = %.3g\n',noi.eta), end
+noi = empiricalnoise(d);
+if o.verb, fprintf('\tnoi.eta = %.3g\n',noi.eta), end
 [X t m dinfo] = detectevents(d,o);  % threshold (no param overrides)
 if ~isfield(o,'eps'), o.eps = 3.5*noi.eta*sqrt(o.num_fea); end  % try auto eps
 [M Nt Ns] = size(X);
@@ -69,13 +70,13 @@ if o.verb
   fprintf('frac classified: %.3g (should be 0.5 to 0.9)\n',sum(pops)/size(X,3))
 end
 
-% decide which waveforms to keep...
+% decide which waveforms to keep... todo: clean this up!
 if isfield(o,'Kkeep'), pok = 1:min(o.Kkeep,K); % force K if big enough (overrides minpop)
 else, pok = pops>=o.minpop; end
 wf.W = W(:,:,pok); % waveforms to keep
 %ikeep = remove_shifted_duplicates(wf.W); % just for now
-ikeep = pok;   % no filtering
-if o.verb, fprintf('from K=%d, keep types: ',sum(pok>0)), fprintf('%3d ',ikeep), fprintf('\n'), end
+ikeep = true(1,sum(pok>0));   % no filtering
+if o.verb, fprintf('from K=%d, keep types: ',size(wf.W,3)), fprintf('%3d ',ikeep), fprintf('\n'), end
 %plot_spike_shapes(wf.W,'waveforms before ikeep'); drawnow;
 wf.W = wf.W(:,:,ikeep);
 wf.freqs = pops(pok(ikeep)); % these freqs are biased due width-selection
