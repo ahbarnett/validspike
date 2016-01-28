@@ -2,6 +2,10 @@
 % Barnett 11/20/15
 % For Jeremy to edit..!
 
+if 0   % load, else generate
+  load data_valid/synth_accuracy_gndtruth_45swap_vs_paper.mat
+
+else
 % 1. Extract waveforms by doing spikesorting (20 sec laptop) ----------------
 clear; d = loaddata('e');  % EJ 2005 elec359 timeseries from data_external/
 d.A = freqfilter(d.A,d.samplefreq,300,[]);
@@ -37,7 +41,10 @@ fprintf('synth done, %d spikes\n',numel(ptrue.t));
 %    Y = Y + freqfilter(noisesample(noi),wf.d.samplefreq,300,[]));
 % We can discuss this.
 
-save data_valid/synth_accuracy_gndtruth.mat Y ptrue so noi
+% NB only wf.d used from wf:
+save data_valid/synth_accuracy_gndtruth.mat Y ptrue so noi wf
+
+end
 
 spikespy({Y,ptrue.t,ptrue.l,'synth'});   % show what we made
 show_crosscorr(ptrue.l,ptrue.t);  % no refractory holes, of course, since
@@ -63,9 +70,11 @@ o.max_matching_offset=10;
 % general stability metric options (verb=3 allows paper outputs)
 o = []; o.Nt = 60; o.max_matching_offset=10; o.verb = 3;
 % stability opts specific to addition metric...
-o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 20; % 20 runs takes 3-4 mins
+%o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 20; % 20 runs takes 3-4 mins
+o.meth = 'rev';
 [fahat,fasam,infoa] = eval_stability_tseriesbased(S, Y, o);
 
+%save data_valid/acc_vs_stab_ampl.4_45swap.mat
 
 % 5. just an attempt to plot for now: we may not even need a fig -----------
 sso=[]; sso.ylab='f_k';               % start stability vs accuracy fig...
@@ -77,11 +86,11 @@ title('orange = acc, black = stability')
 set(gcf,'paperposition',[0 0 5 5]);
 % you can see good correlation, but accuracy is 2-3x closer to 1 than stability.
 
-print -depsc2 acc_vs_stab_ampl.4_Poissonfiring.eps
+%print -depsc2 acc_vs_stab_ampl.4_Poissonfiring.eps
 
 % Leslie discussed stating corr coeff of the two...
 figure; plot(acc.p, fahat, '+'); xlabel('acc'); ylabel('f_k hat');
 title('scatter for ampl std dev = 0.4, K=10');
-print -depsc2 acc_vs_stab_ampl.4_Poissonfiring_scatter.eps
+%print -depsc2 acc_vs_stab_ampl.4_Poissonfiring_scatter.eps
 
 % ie acc.p and fahat

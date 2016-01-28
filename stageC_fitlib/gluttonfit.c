@@ -78,6 +78,7 @@ void fillscore(double* W, int M, int T, int K, int fac, double* Y, int Nt,
       for (k=0; k<K; ++k) S[k + j*K] = NAN;  // write Nan col of S
     }                                        // elseif shflags[j]=0 don't write S
   }
+  free(Wnrms);
 }
 
 
@@ -116,6 +117,7 @@ void smartscore(double* W, int M, int T, int K, int fac, double* Y, int Nt,
       }
     }
   }
+  free(shflags);
 }
  
 
@@ -312,6 +314,12 @@ void gluttonstuffme(double* W, int M, int T, int K, int fac, double* Y, int Nt,
   }
   if (verb && r>maxr) printf("gluttonstuffme reached max # rounds, %d\n",maxr);
   *Ns = c;  // total # spikes found
+  free(tsh);
+  free(S);
+  free(jm);
+  free(lm);
+  free(gm);
+  free(sm);
 }
 
 
@@ -392,6 +400,7 @@ void multiglutton(double* W, int M, int T, int K, int fac, double* Y, int N,
       }
     }
     free(Yc);  // free for each thread
+    free(irng);
   }            // end omp parallel block
   i = 0; // counter to make t,l,a arrays contiguous...
   for (c=0;c<Nc;++c) {

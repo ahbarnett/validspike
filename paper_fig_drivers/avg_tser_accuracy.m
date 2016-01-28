@@ -1,9 +1,9 @@
 % explore average accuracy for synth data w/ gnd truth.
-% See fig_tseries_accuracy_resub.m
+% See fig_tseries_accuracy_resub.m  for making the gndtruth data.
 % Barnett 1/21/16
 
 clear
-load data_valid/synth_accuracy_gndtruth.mat
+load data_valid/synth_accuracy_gndtruth_45swap_vs_paper.mat
 wf.d.samplefreq = 2e4;
 
 % waveform extraction (clustering) opts... (happen to be same as used above)
@@ -22,3 +22,13 @@ for r=1:nr
   % acc.p are the accuracy f_k values (not acc.f, careful!)
   figure; imagesc(P{r}); colormap(goodbw); title(sprintf('run %d',r)); colorbar
 end
+% compute avg acc:
+accbar = 0*acc{1}.p; for r=1:nr, accbar = accbar+acc{r}.p; end
+accbar = accbar/nr;
+
+
+figure
+for r=1:nr
+  subplot(3,4,r); imagesc(P{r}); colormap(goodbw);title(sprintf('run %d',r)); colorbar; drawnow
+end
+set(gcf,'name','for each run, truth is down and sorting across');
