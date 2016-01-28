@@ -103,9 +103,10 @@ These are driver scripts that can be called without arguments, and run complete 
 
 ## Other directories
 
-`data/`  example waveforms, and where around 100 MB of synthetic data is placed  
+`data/`  example waveforms, and where around 100 MB of synthetic data is placed. 
 `paper_fig_drivers/` figure-generating codes for the above preprint and other research. EPS figure output is written to `~/spikesorting/validpaper/` which you should create if you want the EPS outputs.  
-`data_external/` and `data_valid/`  are data directories used by us, that is accessed by some advanced examples and figure-generating codes  
+`data_external/` and `data_valid/`  are data directories used by us, that is accessed by some advanced examples and figure-generating codes. 
+`devel/`  experimental codes. 
 
 ## To do
 
