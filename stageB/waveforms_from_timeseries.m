@@ -62,9 +62,9 @@ X = X(:,:,i);  % subset of clips to cluster
 %o.ta = tm(i); % using 1st moment to align - was bad. Stick to min peak align
 
 [L W z cinfo ta finfo] = spikesort_clips(X,o);           % the meat
-
 if isfield(o,'ta'), o = rmfield(o,'ta'); end
 K = size(W,3);  % initial # clusters found
+fprintf('                       K=%d in w from ts\n',K)
 pops = histc(L,1:K)
 if o.verb
   fprintf('frac classified: %.3g (should be 0.5 to 0.9)\n',sum(pops)/size(X,3))

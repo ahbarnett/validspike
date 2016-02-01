@@ -1,13 +1,11 @@
 % Starting the stability metric vs accuracy comparison for JNM resubmission.
-% Barnett 11/20/15
-% For Jeremy to edit..!
+% Barnett 11/20/15.  late-Jan 2016, and 2/1/16, fixing permutation issues!
 
 clear
-%load data_valid/synth_accuracy_gndtruth_45swap_vs_paper.mat
 
+% 1. get or extract source waveforms ----------------------------------------
 if 0  % if true, extract wf from a fresh fit (see synth_tseries_as_paperfig7b)
-  
-% 1. Extract waveforms by doing spikesorting (20 sec laptop) ----------------
+  % Extract waveforms by doing spikesorting (20 sec laptop)
 clear; d = loaddata('e');  % EJ 2005 elec359 timeseries from data_external/
 d.A = freqfilter(d.A,d.samplefreq,300,[]);
 % waveform extraction opts... (these are as in fig_tseries_meths.m)
@@ -20,7 +18,7 @@ noi = empiricalnoise(d);            % get noi.eta = noise std deviation.
 % the point was to get a wf (wavefunc object) and noi (noise model); clear rest
 clear p co so
 
-else
+else  % load src waveforms "wftrue"
   load data_valid/wf_for_synth_matching_fig7b.mat
   wftrue = wf; clear wf
   noi.eta = 18.3;      % matches fit
@@ -33,7 +31,7 @@ rates = wftrue.freqs;  % use the same rates as in data...
 tpad = 10;           % end padding in samples
 so = [];  % synth opts...
 so.truePois = 1;
-so.ampl = 0.2;     % *** firing variation they wanted: relative ampl std dev
+so.ampl = 0; %0.2;     % *** firing variation they wanted: relative ampl std dev
 % but we should vary more
 noi.Nt = N; noi.M = size(wftrue.W,1);   % basic params for noise model
 [Y ptrue] = synth_Poissonspiketrain(wftrue,N,rates,noi,tpad,[],so);
@@ -50,11 +48,10 @@ fprintf('synth done, %d spikes\n',numel(ptrue.t));
 % NB only wftrue.d used from wftrue:
 %save data_valid/synth_accuracy_gndtruth.mat Y ptrue so noi wftrue
 
-plot_spike_shapes(wftrue.W,'true W');
+%plot_spike_shapes(wftrue.W,'true W'); drawnow
 %spikespy({Y,ptrue.t,ptrue.l,'synth'});   % show what we made
 %show_crosscorr(ptrue.l,ptrue.t);  % no refractory holes, of course, since
                                   % purely Poisson spike trains for now
-
 
 % Setup inline sorter function S for steps 3 and 4 below:
 % waveform extraction (clustering) opts... (happen to be same as used above)
@@ -63,30 +60,37 @@ co = []; co.cmethod='k++'; co.K = 10; co.Kkeep = co.K; co.thresh=100; co.verb=1;
 so = []; so.verb = 1; so.skip = 5; so.nlps = 10;
 S = @(Y) spikesort_timeseries(Y,wftrue.d.samplefreq,co,[],so); % interface
 
+if 0 % Test sorting accuracy, but don't use this run since wrongly permed.
+  [t,l,~,wf] = S(Y);   % sort (few sec)
+  o.max_matching_offset=10;
+  [permL2 P acc times]=times_labels_accuracy(ptrue.t,ptrue.l,t,l,o); % a few sec
+  % acc.p are the accuracy f_k values (not acc.f, careful!)
+  figure; imagesc(P); colormap(goodbw); axis equal tight; title('accuracy Q'); colorbar; xlabel('sorted k (permed)'); ylabel('truth k');
+  [~,invp] = sort(permL2); Wp = wf.W(:,:,invp);     % apply best perm to W
+  plot_spike_shapes(Wp,'sorted W (permed)');
+  spikespy({Y,ptrue.t,ptrue.l,'Y+truth'}, {Y,t,permL2(l),'Y+sorting(permed)'});
+end
 
-% 3. Test sorting accuracy --------------------------------------------
-[t,l,~,wf] = S(Y);   % sort (few sec)
-o.max_matching_offset=10;
-[permL2 P acc times]=times_labels_accuracy(ptrue.t,ptrue.l,t,l,o); % a few sec
-% acc.p are the accuracy f_k values (not acc.f, careful!)
-figure; imagesc(P); colormap(goodbw); axis equal tight; title('accuracy Q'); colorbar; xlabel('sorted k (permed)'); ylabel('truth k');
-[~,invp] = sort(permL2); Wp = wf.W(:,:,invp);     % apply best perm to W
-plot_spike_shapes(Wp,'sorted W (permed)');
-
-spikespy({Y,ptrue.t,ptrue.l,'Y+truth'}, {Y,t,permL2(l),'Y+sorting(permed)'});
-
-stop
-
-
-% 4. Stability metric for sorting ----------------------------------
+% 3. Stability metric, also keeping 1st run in infoa ---------------------------
 % general stability metric options (verb=3 allows paper outputs)
 o = []; o.Nt = 60; o.max_matching_offset=10; o.verb = 3;
 % stability opts specific to addition metric...
-%o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 20; % 20 runs takes 3-4 mins
-o.meth = 'rev';
+o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 1; % 20 runs takes 3-4 mins
+%o.meth = 'rev';
 [fahat,fasam,infoa] = eval_stability_tseriesbased(S, Y, o);
+if strcmp(o.meth,'rev') % specific for NR metric:
+  infoa.wfnr = pull_waveforms_from_tseries(infoa.Ynr,infoa.Tnr,infoa.Lnr,o.Nt,o);
+  [~,invpnr] = sort(infoa.permL2); Wnrp = infoa.wfnr.W(:,:,invpnr); 
+  plot_spike_shapes(Wnrp,'NR stab run permed to match 1st stab run'); drawnow
+end
 
-%save data_valid/acc_vs_stab_ampl.4_45swap.mat
+% 4. Accuracy of 1st run (t,l), given in 1st-run ordering...
+[permsrc P acc times]=times_labels_accuracy(infoa.T,infoa.L,ptrue.t,ptrue.l,o);
+% note P_kj has indices: k = 1st run labels, j = src (true) labels, ie swapped
+plot_spike_shapes(infoa.wf.W,'1st stab run');
+[~,invp] = sort(permsrc); Wtruepermed = wftrue.W(:,:,invp);
+plot_spike_shapes(Wtruepermed,'true W permed to match 1st stab run'); drawnow
+
 
 % 5. just an attempt to plot for now: we may not even need a fig -----------
 sso=[]; sso.ylab='f_k';               % start stability vs accuracy fig...
@@ -102,7 +106,5 @@ set(gcf,'paperposition',[0 0 5 5]);
 
 % Leslie discussed stating corr coeff of the two...
 figure; plot(acc.p, fahat, '+'); xlabel('acc'); ylabel('f_k hat');
-title('scatter for ampl std dev = 0.4, K=10');
+%title('scatter for ampl std dev = 0.4, K=10');
 %print -depsc2 acc_vs_stab_ampl.4_Poissonfiring_scatter.eps
-
-% ie acc.p and fahat

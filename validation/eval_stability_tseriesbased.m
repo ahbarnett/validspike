@@ -103,6 +103,7 @@ elseif strcmp(o.meth,'add')  % ================== self spike addition
     else
       f = diag(Qind(1:K,1:K))./newpops'; f = f(:)';  % simple frac of new correct
     end
+    if o.verb>2, info.La = La; info.Ta = Ta; end  % save the last run
     if o.verb>3 & exist('spikespy'), spikespy({Y,T,L,'Y, unperturbed run'},{Ya,Ta,info.permLa{r}(La),'spike-addition run'}); end    % show signals for paper
     fsam = [fsam; f];    % only works if K fixed. todo: fix
     info.Qs = {info.Qs{:} Qind};
