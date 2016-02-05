@@ -23,7 +23,7 @@ function plot_spike_shapes(w,title0,vertical_spread,t,fig,o)
 %  X, Ts, tptr, etc (see mergeclips).
 %
 % plot_spike_shapes(W, title, vertical_spread, t, fig) uses existing figure
-%  number.
+%  number, or if fig=0 writes to current axes (fig=[] creates new figure).
 % 
 % plot_spike_shapes(W, title, vertical_spread, t, [], opts) control options:
 %    opts.lines = 0,1 switches veritcal dotted lines from t.t
@@ -43,7 +43,7 @@ function plot_spike_shapes(w,title0,vertical_spread,t,fig,o)
 % 2/27/15 opts, lines, existfig
 % 3/31/15 vertical_spread can be <0 for flipping ordering
 % 6/10/15 flip sign of vertical_spread, allow labels w/o times
-
+% 2/3/16 fig=0 writes to curr axes
 
 if nargin<1, test_plot_spike_shapes; return; end
 if nargin<2 || isempty(title0), title0=''; end
@@ -53,8 +53,11 @@ if nargin<3 || isempty(vertical_spread), vertical_spread = 1.0 * max(abs(w.X(:))
 if vertical_spread==0, vertical_spread = 1e-16; end % tiny value (in case w.X=0)
 vertical_spread = -vertical_spread; % change default to downwards incr
 if nargin<4, t=[]; end
-if (nargin<5 || isempty(fig)) existfig=0; fh=figure;
-else existfig=1; fh=fig; figure(fh); end
+if nargin<5, fig = []; end
+existfig=1; fh=gcf;
+if isempty(fig), existfig=0; fh=figure;
+elseif fig~=0, fh=fig; figure(fh);
+end
 if nargin<6, o = []; end               % opts
 if ~isfield(o,'lines'), o.lines = 1; end
 if ~isfield(o,'nums'), o.nums = 1; end

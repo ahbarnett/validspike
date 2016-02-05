@@ -13,10 +13,10 @@ function show_stabilities(fhat,fsam,o)
 %  o.ylab
 %  o.pops - if given (length-K vector), move the f_k bar labels up and add
 %    populations
-%  o.fig - if present, add to this figure handle
+%  o.fig - if present, add to this figure handle (if 0, add to curr axes)
 %  o.blobcolor - (1x3) if present, use as color for blobs plotting
 
-% Barnett 6/26/15
+% Barnett 6/26/15. Fixed fsam transpose bug, 2/3/16
 if nargin<2, fsam=[]; end
 if nargin<3, o=[]; end
 if ~isfield(o,'ylab'), o.ylab = 'f_k'; end
@@ -30,13 +30,15 @@ if ~isempty(fsam) & size(fsam,1)>1
   q = quantile(fsam,[.25 .75]);         % outputs 2 by K
 else, q = []; end
 
-if isfield(o,'fig'), figure(o.fig); hold on; else figure; end
+if isfield(o,'fig')
+  if o.fig~=0, figure(o.fig); hold on; end
+else figure; end
 wid = .25; col = [.7 1 1];     % half-width and color of quantile bars
 if ~isempty(q)
   h=patch(repmat(wid*[-1 1 1 -1]',[1 K])+kron(ones(4,1),1:K), [q(1,:);q(1,:);q(2,:);q(2,:)], col);
   hold on
 end
-if ~isempty(fsam), plot(1:K, fsam, 'b.'); end
+if ~isempty(fsam), plot(1:K, fsam', 'b.'); end            % note transp (if sq)
 plot(1:K, fhat, '.','markersize',30,'color',o.blobcolor);
 xlabel('k'); ylabel(o.ylab); axis([.5 K+.5 0 1]);
 if o.blobcolor==[0 0 0], ysh = 0; else, ysh=0.1; end         % y text offset

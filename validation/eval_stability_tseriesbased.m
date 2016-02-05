@@ -66,7 +66,8 @@ if strcmp(o.meth,'rev')       % ================== noise reversal
   Ynr = 2*F - Y;                                       % the noise reversal
   fprintf('ss noise-rev reversed run\n')
   [T{2} L{2}] = alg(Ynr);
-  if o.verb>2, info.Ynr = Ynr; info.Tnr = T{2}; info.Lnr = L{2}; end  % for figs
+  info.Tnr = T{2}; info.Lnr = L{2};  % for figs
+  if o.verb, info.Ynr = Ynr; end
   [info.permL2 info.Qs info.acc info.times] = times_labels_accuracy(T{1},L{1},T{2},L{2},o);  % dump all out to info for fun
   if o.verb==2 & exist('spikespy'), spikespy({Y,T{1},L{1},'unpert sort'},{F,'regen fwd model'},{Ynr,T{2},info.permL2(L{2}),'rev sort (best perm)'}); end    % show all signals
   if o.verb==3 & exist('spikespy'), spikespy({Y,T{1},L{1},'Y, unperturbed run'},{Ynr,T{2},info.permL2(L{2}),'Ynr, noise-reversed run'}); end    % show signals for paper
@@ -103,11 +104,12 @@ elseif strcmp(o.meth,'add')  % ================== self spike addition
     else
       f = diag(Qind(1:K,1:K))./newpops'; f = f(:)';  % simple frac of new correct
     end
-    if o.verb>2, info.La = La; info.Ta = Ta; end  % save the last run
+    if o.verb, info.La = La; info.Ta = Ta; end  % save the last run
     if o.verb>3 & exist('spikespy'), spikespy({Y,T,L,'Y, unperturbed run'},{Ya,Ta,info.permLa{r}(La),'spike-addition run'}); end    % show signals for paper
     fsam = [fsam; f];    % only works if K fixed. todo: fix
     info.Qs = {info.Qs{:} Qind};
   end
+  info.permL2 = info.permLa{end};  % last best perm, same var name as rev would
 
 end                           % =========== done validation algs
 
