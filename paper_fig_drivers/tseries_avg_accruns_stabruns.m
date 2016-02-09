@@ -6,15 +6,15 @@ load data_valid/wf_for_synth_matching_fig7b.mat    % load "wftrue" source wf
 wftrue = wf; clear wf; K = size(wftrue.W,3);
 %figure(1); plot_spike_shapes(wftrue.W,'truth W',[],[],0); drawnow
 
-nsa = 100;   % # indep synth data expts for acc
-nss = 50;   % # indep synth data expts for stab
+nsa = 1; %100;   % # indep synth data expts for acc
+nss = 10;   % # indep synth data expts for stab (10 for add_r10, 50 for rev)
 
 so = [];  % Synth opts -----
 N = 2.4e6; %1e6;      % length in samples - should be 2.4e6 to match EJ 120s?
 rates = wftrue.freqs;  % use the same rates as in data...
 tpad = 10;           % end padding in samples
 so.truePois = 1;
-amplsig = 0.3;      % ampl variation they wanted: relative ampl std dev
+amplsig = 0.2;      % ampl variation they wanted: relative ampl std dev
 so.ampl = amplsig;
 noi.eta = 20;      % noise size, taken from fitting EJ (meth j)
 noi.Nt = N; noi.M = size(wftrue.W,1);   % basic params for noise model
@@ -39,14 +39,14 @@ end
 % mean...
 accm = 0*acc{1}.p; for i=1:nsa, accm = accm+acc{i}.p; end, accm = accm/nsa;
 v = vertcat(acc{:}); accsam = vertcat(v.p);   % make nsa * K acc samples array
-sso.blobcolor=[.9 .4 0]; show_stabilities(accm,accsam,sso); title(sprintf('ampl=%g: accs a_k',amplsig));
+sso.blobcolor=[.9 .4 0]; show_stabilities(accm,accsam,sso); title(sprintf('ampl=%g: accs a_k',amplsig)); drawnow
 %clear Y; save accsam_nsa30_N2400000_eta20_ampl0.mat
 
 
-% Stability metric options ----------
+% Stability metric options ---------- num_runs = 10 (20 default for add)
 o = []; o.Nt = 60; o.max_matching_offset=10;
-%o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 10; o.verb = 0;
-o.meth = 'rev'; o.verb = 0;
+o.meth = 'add'; o.ratescale = 0.25; o.num_runs = 10; o.verb = 5; % 5 lots info
+%o.meth = 'rev'; o.verb = 0;
 
 % STABILITY RUNS =======================================
 for i=1:nss, fprintf('\nSYNTH REALIZATION FOR STAB #%d:\n\n',i)
@@ -63,7 +63,8 @@ fahatm = 0*fahat{1}; for i=1:nss, fahatm = fahatm+fahat{i}; end
 fahatm = fahatm/nss;
 show_stabilities(fahatm,vertcat(fahat{:})); title(sprintf('ampl=%g: stabs f_k',amplsig));
 
-clear Y; save accstabsam_rev_nss50_N2400000_eta20_ampl.3.mat
+%clear Y; save data_valid/accstabsam_add_r10_nss10_N2400000_eta20_ampl0.mat
+%save data_valid/accstabsam_add_wfap_N2400000_eta20_ampl02.mat
 
 figure; plot(accm,fahatm,'.','markersize',20);
 for k=1:K, text(accm(k),fahatm(k),sprintf('%d',k),'fontsize',20); end
