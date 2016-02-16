@@ -27,6 +27,7 @@ for meth={'rev','add'}, m=meth{1};  % un-celled string
   ylabel('$\overline{f}_k$ (mean over realizations)','interpreter','latex'); xlabel('peak amplitude $\| W^{(k)} \|_\infty$ ($\mu$V)','interpreter','latex');
   %if strcmp(m,'rev'), title('rev'); %axis([0 200 0.5 1]);
   %else, title('add'); %axis([0 200 -.6 1]); end
+  legend({'noise-reversal','spike addition'},'location','east')
   drawnow
 end
 title('stability metrics vs waveform peak amplitude')

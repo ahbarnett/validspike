@@ -24,14 +24,17 @@ for m=1:3          % ...... methods
 end                % ......
 end
 
-if 0 % ----------or, make joint figure for blur & rev (7/8/15):
+if 1 % ----------or, make joint figure for blur & rev (7/8/15):
 vo.meth = 'rev';
 [fhatr,fsamr,infor] = eval_stability_clipbased(@spikesort_clips, X, o, vo);
 vo.meth = 'blur';
 [fhat,fsam,info] = eval_stability_clipbased(@spikesort_clips, X, o, vo);
 so=[]; so.ylab='f_k'; so.blobcolor = [.9 .4 0]; show_stabilities(fhatr,fsamr,so);
 so = []; so.fig = gcf; show_stabilities(fhat,fsam,so);
-title(sprintf('r=%d',o.num_trials)); drawnow
+title(sprintf('r=%d',o.num_trials));
+text(.7,.24,'noise-reversal','color',[.9 .4 0]);
+text(.7,.14,'self-blurring','color',[0 0 0]);
+drawnow
 set(gcf,'paperposition',[0 0 4 4]);
 print('-depsc2',sprintf('~/spikesorting/validpaper/clips_blur+rev_K%d_r%d.eps',o.K,o.num_trials))
 end

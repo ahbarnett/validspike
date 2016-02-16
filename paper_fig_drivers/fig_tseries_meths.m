@@ -55,6 +55,19 @@ print -depsc2 ../spikesorting/validpaper/tseries_fk.eps
 %save data_valid/tseries_thresh120K9keep9.mat
 %save data_valid/tseries_thresh100K10keep10.mat
 
+if 0  % regen the f_k plot...
+  load data_valid/tseries_thresh100K10keep10.mat
+  sso=[]; sso.ylab='f_k';                              % start stability fig...
+  show_stabilities(fahat,fasam,sso);
+  sso.blobcolor=[.9 .4 0]; sso.fig = gcf; % overlay orange rev results
+  show_stabilities(fhat,fsam,sso);
+  sso=[]; sso.fig = gcf; show_stabilities(fahat,[],sso);  % re-overlay black blobs
+  text(.7,.24,'noise-reversal','color',[.9 .4 0]);
+  text(.7,.14,'spike addition','color',[0 0 0]);
+  set(gcf,'paperposition',[0 0 5 5]);
+  print -depsc2 ../spikesorting/validpaper/tseries_fk.eps
+end
+
 if 0 % regen the t-series plot...
   load data_valid/tseries_thresh100K10keep10.mat
   spikespy({d.A,o.T,o.L,'Y, unperturbed run'},{info.Ynr,info.Tnr,info.permL2(info.Lnr),'Ynr, noise-reversed run'});
