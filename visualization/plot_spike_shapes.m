@@ -54,9 +54,10 @@ if vertical_spread==0, vertical_spread = 1e-16; end % tiny value (in case w.X=0)
 vertical_spread = -vertical_spread; % change default to downwards incr
 if nargin<4, t=[]; end
 if nargin<5, fig = []; end
-existfig=1; fh=gcf;
+existfig=1;
 if isempty(fig), existfig=0; fh=figure;
 elseif fig~=0, fh=fig; figure(fh);
+elseif fig==0, fh=gcf;
 end
 if nargin<6, o = []; end               % opts
 if ~isfield(o,'lines'), o.lines = 1; end
