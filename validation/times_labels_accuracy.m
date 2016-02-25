@@ -26,25 +26,25 @@ function [permL2 P acc times]=times_labels_accuracy(T1,L1,T2,L2,opts)
 %  times - struct with times of problems:
 %          times.tfals, times.tmiss, times.twrng - lists of times of
 %          false-positive, missed, and wrong labelled events respectively
-%          (useful when plotted; see SORT_TIMESERIES self-test)
 %
 % Notes: there is no provision for unclassified events (entries of L1 or L2 that
 %  are not in 1...K1 or 1....K2 respectively).
 %
 % See also: TIMES_LABELS_CONFUSION_MATRIX
 
-% Barnett 6/3/15, 6/12/15. New output interface 6/16/15
+% Barnett 6/3/15, 6/12/15. New output interface 6/16/15. miss<->falsepos 2/25/16
 
 if nargin==0, test_times_labels_accuracy; return; end
 if nargin<5, opts = []; end
 if ~isfield(opts,'verb'), opts.verb=(nargout==0); end
 
+fprintf('times_labels_accuracy between n1=%d and n2=%d event lists:\n',numel(T1),numel(T2));
 fprintf('doing times_labels_confusion_matrix...'), t1=tic;
-[P times.tfals times.tmiss times.twrng permL2] = times_labels_confusion_matrix(T1,L1,T2,L2,opts); % the meat
+[P times.tmiss times.tfals times.twrng permL2] = times_labels_confusion_matrix(T1,L1,T2,L2,opts); % the meat
 fprintf(' done in %.3g s\n',toc(t1));
 Nf=numel(times.tfals); Nm=numel(times.tmiss); Nw=numel(times.twrng);
 Ntot = Nf+Nm+Nw;
-fprintf('t_l_compare: %d mistakes (%d false pos, %d missed, %d wrong label)\n',Ntot,Nf,Nm,Nw)
+fprintf('\t%d mistakes (%d missed, %d false pos, %d wrong label)\n',Ntot,Nm,Nf,Nw)
 
 [P acc] = labels_similarity(P);
 

@@ -17,7 +17,7 @@ function [confusion_matrix T1 T2 T2w permL2]=times_labels_confusion_matrix(T1,L1
 %          opts.internal_run_code (default='main') -- an internal parameter 
 % Outputs:
 %  P - confusion matrix (extended, ie size (K1+1)-by-(K2+1)), best permuted.
-%  t1,t2,t2w - the lists of unmatched times in T1, and missed times in T2, and
+%  t1,t2,t2w - the lists of unmatched times in T1, unmatched times in T2, and
 %            wrongly matched times in T2.
 %  permL2 - best permutation of L2, ie the labels permL2(L2) are best matching
 %           against L1, given the times.
