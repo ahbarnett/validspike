@@ -21,6 +21,7 @@ function [wf L z] = waveforms_from_timeseries(A,samplefreq,o)
 % See also: SPIKESORT_TIMESERIES which calls this
 
 % Barnett 3/12/15. maxwid 4/20/15. changed name from class_filtereddata 6/11/15
+% cleaned up keeping waveforms 4/11/16
 
 if nargin<2, o = []; end
 if ~isfield(o,'verb'), o.verb = 1; end
@@ -70,16 +71,13 @@ if o.verb
   fprintf('frac classified: %.3g (should be 0.5 to 0.9)\n',sum(pops)/size(X,3))
 end
 
-% decide which waveforms to keep... todo: clean this up!
+% decide which waveforms to keep...
 if isfield(o,'Kkeep'), pok = 1:min(o.Kkeep,K); % force K if big enough (overrides minpop)
-else, pok = pops>=o.minpop; end
+else, pok = find(pops>=o.minpop); end
 wf.W = W(:,:,pok); % waveforms to keep
-%ikeep = remove_shifted_duplicates(wf.W); % just for now
-ikeep = true(1,sum(pok>0));   % no filtering
-if o.verb, fprintf('from K=%d, keep types: ',size(wf.W,3)), fprintf('%3d ',ikeep), fprintf('\n'), end
-%plot_spike_shapes(wf.W,'waveforms before ikeep'); drawnow;
-wf.W = wf.W(:,:,ikeep);
-wf.freqs = pops(pok(ikeep)); % these freqs are biased due width-selection
+%ikeep = remove_shifted_duplicates(wf.W); pok = pok(ikeep); clear ikeep;  % just for now
+if o.verb, fprintf('from K=%d, keep types: ',K), fprintf('%3d ',pok), fprintf('\n'), end
+wf.freqs = pops(pok);           % these freqs are biased due width-selection
 fprintf('making waveforms done, keeping K=%d\n',size(wf.W,3))
 %if o.verb>1, plot_spike_shapes(wf.W,'waveforms from tseries: final W'); end
 

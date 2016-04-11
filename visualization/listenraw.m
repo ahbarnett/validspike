@@ -19,8 +19,8 @@ p = audioplayer(y', d.samplefreq); % note time is downwards
 play(p);
 
 % todo: make this optional
-wavwrite(y',d.samplefreq,'/tmp/raw.wav');  % deprecated and replaced by (R2014b)...
-%audiowrite('raw.wav',y',d.samplefreq);
+%wavwrite(y',d.samplefreq,'/tmp/raw.wav');  % deprecated and replaced by (R2014b)...
+audiowrite('raw.wav',y',d.samplefreq);  % post-R2014b...
 
 %%%%
 function test_listenraw
